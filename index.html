@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام الحضور والغياب</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background);
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .student-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .student-item {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .student-item:hover {
+            transform: translateY(-3px);
+            background: #e2e8f0;
+        }
+
+        .student-item label {
+            font-size: 1.1em;
+            color: var(--primary-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--secondary-color);
+        }
+
+        button {
+            background: var(--secondary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>نظام تسجيل الحضور اليومي</h1>
+        <form id="attendanceForm">
+            <div class="student-list">
+                <div class="student-item">
+                    <label>
+                        <input type="checkbox" name="student1">
+                        أحمد محمود
+                    </label>
+                </div>
+                <div class="student-item">
+                    <label>
+                        <input type="checkbox" name="student2">
+                        محمد علي
+                    </label>
+                </div>
+                <div class="student-item">
+                    <label>
+                        <input type="checkbox" name="student3">
+                        فاطمة حسن
+                    </label>
+                </div>
+                <div class="student-item">
+                    <label>
+                        <input type="checkbox" name="student4">
+                        ليلى عمر
+                    </label>
+                </div>
+                <div class="student-item">
+                    <label>
+                        <input type="checkbox" name="student5">
+                        خالد عبد الله
+                    </label>
+                </div>
+            </div>
+            <button type="submit">حفظ البيانات ▸</button>
+        </form>
+    </div>
+
+    <script>
+document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const students = ["student1", "student2", "student3", "student4", "student5", "student6"];
+    const formData = {};
+
+    students.forEach(student => {
+        const checkbox = document.querySelector(`[name="${student}"]`);
+        formData[student] = checkbox ? checkbox.checked : false;
+    });
+
+    try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbzP66DGq4ZaZ5xoNMoVu_hb3CWhCrKPiDun7Uat9zAeHRcvq-x27Om1T_IYpuRFn4L9YA/exec', {
+            method: 'POST',
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            showNotification('تم حفظ البيانات بنجاح', 'success');
+        } else {
+            throw new Error('فشل في الحفظ');
+        }
+    } catch (error) {
+        showNotification('حدث خطأ أثناء الحفظ، يرجى المحاولة لاحقًا', 'error');
+    }
+});
+    </script>
+</body>
+</html>
