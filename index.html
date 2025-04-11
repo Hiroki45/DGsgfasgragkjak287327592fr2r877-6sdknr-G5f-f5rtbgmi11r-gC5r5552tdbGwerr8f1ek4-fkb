@@ -1,250 +1,458 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student Attendance</title>
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script>
-    <style>
-      .form-container {
-        max-width: 500px;
-        margin: auto;
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Updated Title -->
+  <title>تسجيل حضور الطلاب - عاشر  د</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- SweetAlert2 CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.min.css"
+  />
+  <!-- خط Cairo للغة العربية -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- Theme Variables --- */
+    :root { /* Default: Dark Theme Variables */
+      --bg-color: #121212;
+      --surface-color: #1e1e1e;
+      --surface-variant: #2c2c2c;
+      --primary-text-color: #e0e0e0;
+      --secondary-text-color: #b0b0b0;
+      --accent-color: #bb86fc; /* Purple */
+      --accent-hover-color: #a775d1;
+      --accent-focus-shadow: rgba(187, 134, 252, 0.5);
+      --error-color: #cf6679;
+      --border-color: #3a3a3a;
+      --scrollbar-thumb-color: #555;
+      --scrollbar-track-color: var(--surface-variant);
+      --input-bg-color: #333;
+      --input-border-color: #555;
+      --button-text-color: var(--bg-color); /* Text color for accent button */
+      --theme-toggle-bg: var(--surface-variant);
+      --theme-toggle-text: var(--primary-text-color);
+      --theme-toggle-hover-bg: #404040;
+    }
+
+    body[data-theme="light"] { /* Light Theme Variables */
+      --bg-color: #f8f9fa; /* Light Gray */
+      --surface-color: #ffffff; /* White */
+      --surface-variant: #e9ecef; /* Lighter Gray */
+      --primary-text-color: #212529; /* Dark Gray/Black */
+      --secondary-text-color: #6c757d; /* Medium Gray */
+      --accent-color: #007bff; /* Bootstrap Blue */
+      --accent-hover-color: #0056b3;
+      --accent-focus-shadow: rgba(0, 123, 255, 0.5);
+      --error-color: #dc3545; /* Bootstrap Red */
+      --border-color: #dee2e6; /* Light Border */
+      --scrollbar-thumb-color: #adb5bd;
+      --scrollbar-track-color: var(--surface-variant);
+      --input-bg-color: #ffffff;
+      --input-border-color: #ced4da;
+      --button-text-color: #ffffff; /* Text color for accent button */
+      --theme-toggle-bg: #e9ecef;
+      --theme-toggle-text: var(--primary-text-color);
+      --theme-toggle-hover-bg: #ced4da;
+    }
+
+    /* --- Base Styles (Applied regardless of theme using variables) --- */
+    body {
+      background-color: var(--bg-color);
+      color: var(--primary-text-color);
+      font-family: 'Cairo', sans-serif;
+      direction: rtl;
+      text-align: right;
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+    }
+
+    .container {
         margin-top: 50px;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
+        margin-bottom: 50px;
+    }
+
+     /* --- *** NEW: Hide main content initially *** --- */
+    #main-content {
+      display: none;
+    }
+
+    /* --- Theme Toggle Button --- */
+    #theme-toggle-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px; /* Positioned left for LTR, adjusts automatically for RTL? Check */
+      /* Consider using logical properties: inset-inline-start: 15px; */
+      z-index: 1050; /* Above most elements */
+      background-color: var(--theme-toggle-bg);
+      color: var(--theme-toggle-text);
+      border: 1px solid var(--border-color);
+      border-radius: 50%; /* Circular */
+      width: 45px;
+      height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.4rem; /* Adjust icon size */
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    }
+    #theme-toggle-btn:hover {
+      background-color: var(--theme-toggle-hover-bg);
+       transform: scale(1.1);
+    }
+     #theme-toggle-btn:focus {
+       outline: none;
+       box-shadow: 0 0 0 3px var(--accent-focus-shadow);
+     }
+
+
+    /* --- حاوية النموذج --- */
+    .form-container {
+      max-width: 550px;
+      margin: 50px auto;
+      padding: 35px;
+      background-color: var(--surface-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+    }
+    .form-container h4 {
+      color: var(--primary-text-color);
+      margin-bottom: 15px;
+      font-weight: 700;
+       transition: color 0.3s ease;
+    }
+    .form-container p.small {
+      color: var(--secondary-text-color);
+      margin-bottom: 30px;
+       transition: color 0.3s ease;
+    }
+    .form-container h5 {
+      color: var(--primary-text-color);
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+       transition: color 0.3s ease;
+    }
+
+    /* --- حاوية قائمة الطلاب --- */
+    .student-list-container {
+      max-height: 400px;
+      margin-bottom: 1.5rem;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      padding: 10px 5px 10px 15px;
+      border-radius: 8px;
+      background-color: var(--surface-variant);
+      position: relative;
+      transition: border-color 0.3s ease, background-color 0.3s ease; /* Smooth transition */
+    }
+    .student-list-container:focus-within {
+      border-color: var(--accent-color);
+    }
+
+    /* --- تنسيق عناصر قائمة الطلاب --- */
+    .form-check {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 25px;
+      padding: 12px 15px;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease, border-color 0.3s ease;
+      cursor: pointer;
+      padding-right: 35px;
+    }
+    .form-check:last-child {
+      border-bottom: none;
+    }
+    .form-check:hover {
+      /* Adjusted hover for both themes */
+      background-color: rgba(128, 128, 128, 0.1);
+    }
+    .form-check-label {
+      flex: 1;
+      font-size: 1rem;
+      margin: 0;
+      color: var(--primary-text-color);
+      overflow-wrap: break-word;
+      word-break: break-word;
+      min-width: 0;
+      transition: color 0.3s ease;
+    }
+    .form-check-input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--accent-color); /* Primary way to theme checkbox */
+      background-color: var(--input-bg-color); /* Background */
+      border: 2px solid var(--input-border-color); /* Border */
+      border-radius: 4px;
+      transition: transform 0.2s ease-in-out, border-color 0.2s ease, background-color 0.3s ease;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      display: grid;
+      place-content: center;
+      margin-right: -30px;
+      flex-shrink: 0;
+    }
+    /* Checkmark color is controlled by --accent-color via the mask */
+    .form-check-input::before {
+        content: "";
+        width: 0.70em;
+        height: 0.70em;
+        transform: scale(0);
+        transition: 120ms transform ease-in-out;
+        box-shadow: inset 1em 1em var(--accent-color); /* Use variable for color */
+        background-color: transparent;
+        transform-origin: center center;
+        -webkit-mask-image: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" viewBox="0 0 16 16"%3E%3Cpath fill-rule="evenodd" d="M13.485 3.485a.75.75 0 0 1 0 1.06l-8 8a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06L5 11.94l7.47-7.47a.75.75 0 0 1 1.015 0z" clip-rule="evenodd" fill="%23FFFFFF"%2F%3E%3C%2Fsvg%3E');
+        mask-image: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" viewBox="0 0 16 16"%3E%3Cpath fill-rule="evenodd" d="M13.485 3.485a.75.75 0 0 1 0 1.06l-8 8a.75.75 0 0 1-1.06 0l-4-4a.75.75 0 1 1 1.06-1.06L5 11.94l7.47-7.47a.75.75 0 0 1 1.015 0z" clip-rule="evenodd" fill="%23FFFFFF"%2F%3E%3C%2Fsvg%3E');
+        mask-repeat: no-repeat;
+        mask-position: center;
+        mask-size: contain;
+    }
+    .form-check-input:checked::before {
+        transform: scale(1);
+    }
+    .form-check-input:checked {
+        border-color: var(--accent-color); /* Use variable */
+        background-color: var(--input-bg-color); /* Keep background consistent */
+    }
+    .form-check-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--accent-focus-shadow); /* Use variable */
+    }
+
+    /* --- حاوية عنصر التحميل ورسائل الحالة --- */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 0;
+      min-height: 150px;
+    }
+    .loading-text {
+      margin-top: 15px;
+      font-size: 1rem;
+      color: var(--primary-text-color);
+      transition: color 0.3s ease;
+    }
+    .loading-message,
+    .error-message {
+      text-align: center;
+      padding: 20px;
+      font-style: normal;
+    }
+    .loading-message {
+      color: var(--secondary-text-color);
+      transition: color 0.3s ease;
+    }
+    .error-message {
+      color: var(--error-color); /* Error text color */
+      font-weight: bold;
+      /* Adjust background for better visibility in both themes */
+      background-color: rgba(var(--error-rgb, 220, 53, 69), 0.1); /* Fallback red */
+      border-radius: 6px;
+      border: 1px solid var(--error-color);
+      transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+    }
+    /* Define --error-rgb based on theme for the background */
+    :root { --error-rgb: 207, 102, 121; }
+    body[data-theme="light"] { --error-rgb: 220, 53, 69; }
+
+    /* --- عنصر التحميل الجديد (مُحسَّن) --- */
+    .pulsing-loader span {
+        /* Properties using variables that will change with theme */
+        background-color: var(--accent-color);
+        animation: pulse 1.4s infinite ease-in-out both;
+        transition: background-color 0.3s ease; /* Smooth transition for loader dots */
+
+        /* Static properties */
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+    .pulsing-loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        height: 40px;
+    }
+    .pulsing-loader span:nth-child(1) { animation-delay: -0.32s; }
+    .pulsing-loader span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes pulse {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.3; }
+      40% { transform: scale(1.0); opacity: 1; }
+    }
+
+    /* --- زر الإرسال الأساسي --- */
+    .btn-primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      color: var(--button-text-color); /* Use variable for text */
+      font-weight: bold;
+      padding: 12px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary:hover,
+    .btn-primary:focus {
+      background-color: var(--accent-hover-color);
+      border-color: var(--accent-hover-color);
+      color: var(--button-text-color);
+      outline: none;
+    }
+    .btn-primary:focus {
+       box-shadow: 0 0 0 0.25rem var(--accent-focus-shadow);
+    }
+    .btn-primary:active {
+        /* Slightly darker accent color on active, adjust manually if needed */
+        background-color: var(--accent-hover-color);
+        border-color: var(--accent-hover-color);
+        filter: brightness(0.9); /* Simple way to darken */
+    }
+     .btn-primary:disabled {
+        /* Style for disabled state needs careful variable choice */
+        background-color: var(--secondary-text-color);
+        border-color: var(--secondary-text-color);
+        color: var(--surface-variant); /* Low contrast text */
+        opacity: 0.65; /* Standard disabled opacity */
+        cursor: not-allowed;
+     }
+
+    /* --- تنسيق الروابط --- */
+    a {
+      color: var(--accent-color);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    a:hover {
+      color: var(--accent-hover-color);
+      text-decoration: underline;
+    }
+
+    /* --- تنسيق شريط التمرير --- */
+    .student-list-container::-webkit-scrollbar { width: 10px; }
+    .student-list-container::-webkit-scrollbar-track { background: var(--scrollbar-track-color); border-radius: 5px; transition: background-color 0.3s ease;}
+    .student-list-container::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-color); border-radius: 5px; border: 2px solid var(--scrollbar-track-color); transition: background-color 0.3s ease; }
+    .student-list-container::-webkit-scrollbar-thumb:hover { filter: brightness(1.2); } /* Generic hover effect */
+    /* Firefox Scrollbar */
+    .student-list-container { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color); }
+
+    /* SweetAlert Theming (Basic - might need more specific rules depending on version/needs) */
+    .swal2-popup {
+        background-color: var(--surface-color) !important;
+        color: var(--primary-text-color) !important;
+        border: 1px solid var(--border-color);
+        /* Ensure prompt appears above content */
+        z-index: 1060 !important;
+    }
+    /* Style SweetAlert input field */
+    .swal2-input {
+        background-color: var(--input-bg-color) !important;
+        color: var(--primary-text-color) !important;
+        border: 1px solid var(--input-border-color) !important;
+    }
+    .swal2-input:focus {
+         border-color: var(--accent-color) !important;
+         box-shadow: 0 0 0 3px var(--accent-focus-shadow) !important;
+    }
+    .swal2-validation-message { /* Style error message in prompt */
+        background-color: rgba(var(--error-rgb, 220, 53, 69), 0.1) !important;
+        color: var(--error-color) !important;
+    }
+    .swal2-title {
+        color: var(--primary-text-color) !important;
+    }
+    .swal2-content, .swal2-html-container { /* Target container for text */
+        color: var(--primary-text-color) !important;
+    }
+    .swal2-styled.swal2-confirm {
+        background-color: var(--accent-color) !important;
+        color: var(--button-text-color) !important; /* Use text color var */
+        border-color: var(--accent-color) !important;
+        box-shadow: none !important; /* Reset shadow maybe */
+    }
+    .swal2-styled.swal2-confirm:focus {
+        box-shadow: 0 0 0 3px var(--accent-focus-shadow) !important;
+    }
+    .swal2-icon.swal2-success .swal2-success-line-tip,
+    .swal2-icon.swal2-success .swal2-success-line-long {
+       background-color: var(--accent-color) !important;
+    }
+     .swal2-icon.swal2-success .swal2-success-ring {
+        border-color: var(--accent-color) !important;
+     }
+      .swal2-icon.swal2-error .swal2-x-mark-line-left,
+      .swal2-icon.swal2-error .swal2-x-mark-line-right {
+          background-color: var(--error-color) !important;
       }
-      .student-list {
-          margin-bottom: 1.5rem;
+      .swal2-icon.swal2-error {
+         border-color: var(--error-color) !important;
       }
-      .form-check-label {
-          margin-left: 5px;
-      }
-    </style>
-  </head>
-  <body class="bg-light">
+     /* Add more overrides for other elements (cancel button, icons etc.) if needed */
+
+  </style>
+</head>
+<!-- Add data-theme attribute to body -->
+<body data-theme="dark"> <!-- Default theme -->
+
+  <!-- Theme Toggle Button -->
+  <button id="theme-toggle-btn" aria-label="Switch to light theme">☀️</button>
+
+  <!-- *** NEW: Wrapper for main content *** -->
+  <div id="main-content">
     <div class="container">
       <div class="form-container">
-        <h4 class="text-center mb-4">Record Student Attendance</h4>
-        <p class="text-center text-muted">Check the box if the student is PRESENT.</p>
-        <form id="submit-attendance-to-google-sheet">
-
-          <div class="student-list">
-             <h5>Student List:</h5>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Ahmed_Ali" name="student_Ahmed Ali" value="Present">
-               <label class="form-check-label" for="student_Ahmed_Ali">Ahmed Ali</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Fatima_Khan" name="student_Fatima Khan" value="Present">
-               <label class="form-check-label" for="student_Fatima_Khan">Fatima Khan</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Youssef_Hassan" name="student_Youssef Hassan" value="Present">
-               <label class="form-check-label" for="student_Youssef_Hassan">Youssef Hassan</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Layla_Mohamed" name="student_Layla Mohamed" value="Present">
-               <label class="form-check-label" for="student_Layla_Mohamed">Layla Mohamed</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Omar_Farooq" name="student_Omar Farooq" value="Present">
-               <label class="form-check-label" for="student_Omar_Farooq">Omar Farooq</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Saleem_Alzoubi" name="student_Saleem Alzoubi" value="Present">
-               <label class="form-check-label" for="student_Saleem_Alzoubi">Saleem Alzoubi</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Noor_Ahmed" name="student_Noor Ahmed" value="Present">
-               <label class="form-check-label" for="student_Noor_Ahmed">Noor Ahmed</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Khalid_Mahmoud" name="student_Khalid Mahmoud" value="Present">
-               <label class="form-check-label" for="student_Khalid_Mahmoud">Khalid Mahmoud</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Aisha_Omar" name="student_Aisha Omar" value="Present">
-               <label class="form-check-label" for="student_Aisha_Omar">Aisha Omar</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Tariq_Hussein" name="student_Tariq Hussein" value="Present">
-               <label class="form-check-label" for="student_Tariq_Hussein">Tariq Hussein</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Lina_Fawzi" name="student_Lina Fawzi" value="Present">
-               <label class="form-check-label" for="student_Lina_Fawzi">Lina Fawzi</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Bassam_Karim" name="student_Bassam Karim" value="Present">
-               <label class="form-check-label" for="student_Bassam_Karim">Bassam Karim</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Dalia_Nasser" name="student_Dalia Nasser" value="Present">
-               <label class="form-check-label" for="student_Dalia_Nasser">Dalia Nasser</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Waleed_Saad" name="student_Waleed Saad" value="Present">
-               <label class="form-check-label" for="student_Waleed_Saad">Waleed Saad</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Huda_Ismail" name="student_Huda Ismail" value="Present">
-               <label class="form-check-label" for="student_Huda_Ismail">Huda Ismail</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Ziad_Abbas" name="student_Ziad Abbas" value="Present">
-               <label class="form-check-label" for="student_Ziad_Abbas">Ziad Abbas</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Rania_Taha" name="student_Rania Taha" value="Present">
-               <label class="form-check-label" for="student_Rania_Taha">Rania Taha</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Sami_Rashid" name="student_Sami Rashid" value="Present">
-               <label class="form-check-label" for="student_Sami_Rashid">Sami Rashid</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Amira_Saleh" name="student_Amira Saleh" value="Present">
-               <label class="form-check-label" for="student_Amira_Saleh">Amira Saleh</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Faisal_Qasim" name="student_Faisal Qasim" value="Present">
-               <label class="form-check-label" for="student_Faisal_Qasim">Faisal Qasim</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Leila_Hamid" name="student_Leila Hamid" value="Present">
-               <label class="form-check-label" for="student_Leila_Hamid">Leila Hamid</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Majid_Jaber" name="student_Majid Jaber" value="Present">
-               <label class="form-check-label" for="student_Majid_Jaber">Majid Jaber</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Sara_Khalil" name="student_Sara Khalil" value="Present">
-               <label class="form-check-label" for="student_Sara_Khalil">Sara Khalil</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Adnan_Farhan" name="student_Adnan Farhan" value="Present">
-               <label class="form-check-label" for="student_Adnan_Farhan">Adnan Farhan</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Nadia_Walid" name="student_Nadia Walid" value="Present">
-               <label class="form-check-label" for="student_Nadia_Walid">Nadia Walid</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Hamza_Zaki" name="student_Hamza Zaki" value="Present">
-               <label class="form-check-label" for="student_Hamza_Zaki">Hamza Zaki</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Yasmin_Rami" name="student_Yasmin Rami" value="Present">
-               <label class="form-check-label" for="student_Yasmin_Rami">Yasmin Rami</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Karim_Bashir" name="student_Karim Bashir" value="Present">
-               <label class="form-check-label" for="student_Karim_Bashir">Karim Bashir</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Jamila_Hakim" name="student_Jamila Hakim" value="Present">
-               <label class="form-check-label" for="student_Jamila_Hakim">Jamila Hakim</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Tamer_Naji" name="student_Tamer Naji" value="Present">
-               <label class="form-check-label" for="student_Tamer_Naji">Tamer Naji</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Hanan_Sami" name="student_Hanan Sami" value="Present">
-               <label class="form-check-label" for="student_Hanan_Sami">Hanan Sami</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Bilal_Hadi" name="student_Bilal Hadi" value="Present">
-               <label class="form-check-label" for="student_Bilal_Hadi">Bilal Hadi</label>
-             </div>
-
-             <div class="form-check">
-               <input class="form-check-input" type="checkbox" id="student_Farida_Kamal" name="student_Farida Kamal" value="Present">
-               <label class="form-check-label" for="student_Farida_Kamal">Farida Kamal</label>
-             </div>
-
+        <h4 class="text-center">تسجيل حضور الطلاب</h4>
+        <p class="text-center small mb-3">
+          ضع علامة بجانب اسم الطالب لتسجيل حضوره.
+        </p>
+        <!-- نموذج إرسال الحضور -->
+        <form id="submit-attendance-to-google-sheet" name="submit-attendance-to-google-sheet">
+          <!-- قائمة الطلاب -->
+          <h5>قائمة الطلاب:</h5>
+          <div id="student-list-container" class="student-list-container" tabindex="0">
+            <!-- *** Loading state handled by JS *** -->
+             <div class="loading-container">
+               <div class="pulsing-loader">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+               </div>
+              <div class="loading-text text-center">جاري تحميل قائمة الطلاب...</div>
+            </div>
           </div>
-
-          <button type="submit" class="btn btn-primary btn-block">
-            Submit Attendance
+          <button type="submit" class="btn btn-primary btn-block mt-4">
+            إرسال الحضور
           </button>
         </form>
       </div>
     </div>
+  </div> <!-- *** End of main content wrapper *** -->
 
-    <script>
-      const scriptURL = "https://script.google.com/macros/s/AKfycbxHfcOtmuUiZW4fbsJn7uTydJCaYA7T4b528wbUkpfxspCDQjsVRFugTxK75mo_wg/exec";
-      const form = document.forms["submit-attendance-to-google-sheet"];
 
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const submitButton = form.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = 'Submitting...';
+  <!-- JS Libraries (Keep as they are) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script>
 
-        const formData = new FormData(form);
-
-        fetch(scriptURL, { method: "POST", body: formData })
-          .then(response => response.json())
-          .then(data => {
-              console.log('Success:', data);
-              if(data.result === 'success') {
-                   swal("Done", `Attendance recorded in column ${data.column}.`, "success");
-                   form.reset();
-              } else {
-                   swal("Error", data.error ? data.error : "Submission failed. Please check Google Sheet setup or script logs.", "error");
-              }
-          })
-          .catch((error) => {
-            console.error("Fetch Error!", error.message);
-            swal("Error", "Could not reach submission server. Please check URL or network.", "error");
-          })
-          .finally(() => {
-              submitButton.disabled = false;
-              submitButton.textContent = 'Submit Attendance';
-          });
-      });
-    </script>
-  </body>
+  <script src="site.js"></script>
+</body>
 </html>
