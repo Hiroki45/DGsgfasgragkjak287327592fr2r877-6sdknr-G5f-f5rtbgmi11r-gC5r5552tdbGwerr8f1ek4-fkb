@@ -287,7 +287,7 @@
         });
     });
 
-    // --- Initial Page Load ---
+    // --- جميع الحقوق محفوظة لسليم ياسر سليم الزعبي ---
     document.addEventListener("DOMContentLoaded", () => {
         initializeTheme();       // Initialize theme first (so prompt is themed)
         promptForPassword();     // Ask for password BEFORE loading anything else
